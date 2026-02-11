@@ -21,4 +21,4 @@ Supabase (PostgreSQL). Project: **Personal** (ID: `psmgwsvkbdeyfmzegsfq`, region
 
 ## Pipeline Flow
 
-Google Maps API → Crawl website (Puppeteer) → Extract owner name/email (Claude Haiku) → Companies House fallback → Verify email → Store in Supabase → Send personalised email (Outlook/Graph API) → Track opens/clicks via Supabase Edge Function → Display on dashboard
+Google Maps API → Crawl website (fetch) → Extract owner name/email (OpenAI gpt-4o-mini) → Companies House fallback → Verify email → Store in Supabase → Send personalised email (Outlook/Graph API) → Track opens/clicks via Supabase Edge Function → Display on dashboard

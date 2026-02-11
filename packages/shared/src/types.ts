@@ -68,6 +68,16 @@ export interface FollowUp {
   content: string;
 }
 
+export interface ApiUsage {
+  id: string;
+  prospect_id: string | null;
+  model: string;
+  input_tokens: number;
+  output_tokens: number;
+  estimated_cost: number;
+  created_at: string;
+}
+
 export interface Lead {
   id: string;
   prospect_id: string;

@@ -9,6 +9,44 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_usage: {
+        Row: {
+          id: string
+          prospect_id: string | null
+          model: string
+          input_tokens: number
+          output_tokens: number
+          estimated_cost: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          prospect_id?: string | null
+          model: string
+          input_tokens: number
+          output_tokens: number
+          estimated_cost: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          prospect_id?: string | null
+          model?: string
+          input_tokens?: number
+          output_tokens?: number
+          estimated_cost?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaigns: {
         Row: {
           created_at: string

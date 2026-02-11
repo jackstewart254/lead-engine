@@ -5,6 +5,7 @@ config({ path: path.resolve(process.cwd(), "../../.env") });
 import { searchBusinesses } from "./google-places";
 import { storeProspects } from "./store-prospects";
 import { runCampaign } from "./run-campaign";
+import { enrichProspects } from "./enrich-prospects";
 
 const command = process.argv[2];
 
@@ -21,6 +22,10 @@ async function main() {
       }
       break;
     }
+    case "enrich": {
+      await enrichProspects();
+      break;
+    }
     case "send": {
       const campaignId = process.argv[3];
       if (!campaignId) {
@@ -31,7 +36,7 @@ async function main() {
       break;
     }
     default:
-      console.error("Usage: npx tsx src/index.ts <scrape|send> [args...]");
+      console.error("Usage: npx tsx src/index.ts <scrape|enrich|send> [args...]");
       process.exit(1);
   }
 }
