@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export function SendCampaignButton({
   campaignId,
@@ -29,13 +30,16 @@ export function SendCampaignButton({
 
   return (
     <div className="flex items-center gap-2">
-      <button
+      <motion.button
         onClick={handleSend}
         disabled={loading}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
         className="rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-success/90 disabled:opacity-50"
       >
         {loading ? "Sending..." : "Send"}
-      </button>
+      </motion.button>
       {result && (
         <span className="text-xs text-muted">{result}</span>
       )}

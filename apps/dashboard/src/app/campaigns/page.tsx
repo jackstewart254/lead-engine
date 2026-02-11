@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageTransition } from "@/components/ui/animated";
 import { getCampaigns } from "@/lib/queries";
 import { CampaignForm } from "@/components/forms/campaign-form";
 import { SendCampaignButton } from "@/components/actions/send-campaign-button";
@@ -29,7 +30,7 @@ export default async function CampaignsPage() {
   const campaigns = await getCampaigns();
 
   return (
-    <>
+    <PageTransition>
       <PageHeader
         title="Campaigns"
         description="Create and manage email campaigns"
@@ -45,6 +46,6 @@ export default async function CampaignsPage() {
       ) : (
         <DataTable columns={columns} data={campaigns} />
       )}
-    </>
+    </PageTransition>
   );
 }

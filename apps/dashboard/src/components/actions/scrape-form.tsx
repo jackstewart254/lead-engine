@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { WorkerOutput } from "./worker-output";
 
 export function ScrapeForm() {
@@ -29,7 +30,7 @@ export function ScrapeForm() {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-card-bg p-6">
+      <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-card-bg p-6 shadow-[var(--shadow-md)]">
         <h2 className="mb-4 text-lg font-semibold">Scrape Google Places</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -57,13 +58,16 @@ export function ScrapeForm() {
             />
           </div>
         </div>
-        <button
+        <motion.button
           type="submit"
           disabled={loading}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
           className="mt-4 rounded-lg bg-info px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-info/90 disabled:opacity-50"
         >
           {loading ? "Scraping..." : "Run Scrape"}
-        </button>
+        </motion.button>
       </form>
       <WorkerOutput output={result?.output ?? null} success={result?.success ?? null} />
     </div>

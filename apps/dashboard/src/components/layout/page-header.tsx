@@ -1,3 +1,7 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 export function PageHeader({
   title,
   description,
@@ -8,7 +12,12 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-8 flex items-center justify-between">
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="mb-8 flex items-center justify-between"
+    >
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
         {description && (
@@ -16,6 +25,6 @@ export function PageHeader({
         )}
       </div>
       {action && <div>{action}</div>}
-    </div>
+    </motion.div>
   );
 }

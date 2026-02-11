@@ -1,3 +1,7 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 const colorMap: Record<string, string> = {
   active: "bg-success/10 text-success",
   draft: "bg-muted/10 text-muted",
@@ -14,8 +18,13 @@ const colorMap: Record<string, string> = {
 export function StatusBadge({ status }: { status: string }) {
   const classes = colorMap[status] ?? "bg-muted/10 text-muted";
   return (
-    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${classes}`}>
+    <motion.span
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${classes}`}
+    >
       {status}
-    </span>
+    </motion.span>
   );
 }

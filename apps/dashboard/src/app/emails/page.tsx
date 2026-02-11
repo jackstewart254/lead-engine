@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageTransition } from "@/components/ui/animated";
 import { getEmailsSent } from "@/lib/queries";
 import type { EmailSent, Prospect } from "@lead-engine/shared";
 
@@ -58,7 +59,7 @@ export default async function EmailsPage() {
   const emails = await getEmailsSent();
 
   return (
-    <>
+    <PageTransition>
       <PageHeader
         title="Emails Sent"
         description={`${emails.length} emails tracked`}
@@ -71,6 +72,6 @@ export default async function EmailsPage() {
       ) : (
         <DataTable columns={columns} data={emails} />
       )}
-    </>
+    </PageTransition>
   );
 }

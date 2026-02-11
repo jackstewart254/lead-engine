@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageTransition } from "@/components/ui/animated";
 import { getProspects } from "@/lib/queries";
 import type { Prospect } from "@lead-engine/shared";
 
@@ -11,19 +12,27 @@ const columns: Column<Prospect>[] = [
   { header: "Location", accessor: "location" },
   {
     header: "Website",
-    accessor: (row) =>
-      row.website ? (
+    accessor: (row) => {
+      if (!row.website) return "—";
+      let hostname: string;
+      try {
+        hostname = new URL(
+          row.website.startsWith("http") ? row.website : `https://${row.website}`
+        ).hostname;
+      } catch {
+        hostname = row.website;
+      }
+      return (
         <a
-          href={row.website}
+          href={row.website.startsWith("http") ? row.website : `https://${row.website}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-info underline"
         >
-          {new URL(row.website).hostname}
+          {hostname}
         </a>
-      ) : (
-        "—"
-      ),
+      );
+    },
   },
   {
     header: "Site Status",
@@ -57,7 +66,7 @@ export default async function ProspectsPage() {
   const prospects = await getProspects();
 
   return (
-    <>
+    <PageTransition>
       <PageHeader
         title="Prospects"
         description={`${prospects.length} businesses found`}
@@ -70,6 +79,6 @@ export default async function ProspectsPage() {
       ) : (
         <DataTable columns={columns} data={prospects} />
       )}
-    </>
+    </PageTransition>
   );
 }

@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageTransition, StaggerContainer, StaggerItem } from "@/components/ui/animated";
 import { getLeads } from "@/lib/queries";
 import type { Lead, Prospect } from "@lead-engine/shared";
 
@@ -17,7 +18,7 @@ export default async function LeadsPage() {
   }));
 
   return (
-    <>
+    <PageTransition>
       <PageHeader
         title="Leads"
         description={`${leads.length} leads in pipeline`}
@@ -28,11 +29,11 @@ export default async function LeadsPage() {
           description="Leads appear when prospects engage with your emails"
         />
       ) : (
-        <div className="space-y-8">
+        <StaggerContainer className="space-y-8">
           {grouped.map(
             (group) =>
               group.leads.length > 0 && (
-                <div key={group.status}>
+                <StaggerItem key={group.status}>
                   <div className="mb-3 flex items-center gap-2">
                     <StatusBadge status={group.status} />
                     <span className="text-sm text-muted">
@@ -43,7 +44,7 @@ export default async function LeadsPage() {
                     {group.leads.map((lead: LeadRow) => (
                       <div
                         key={lead.id}
-                        className="flex items-center justify-between rounded-lg border border-border bg-card-bg p-4"
+                        className="flex items-center justify-between rounded-lg border border-border bg-card-bg p-4 shadow-[var(--shadow-sm)]"
                       >
                         <div>
                           <p className="font-medium">
@@ -67,11 +68,11 @@ export default async function LeadsPage() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </StaggerItem>
               )
           )}
-        </div>
+        </StaggerContainer>
       )}
-    </>
+    </PageTransition>
   );
 }
