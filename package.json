@@ -9,6 +9,8 @@
     "dev:dashboard": "npm -w apps/dashboard run dev",
     "dev:worker": "npm -w apps/worker run dev",
     "build:dashboard": "npm -w apps/dashboard run build",
-    "build:worker": "npm -w apps/worker run build"
+    "build:worker": "npm -w apps/worker run build",
+    "dev:email-verifier": "npm -w apps/email-verifier run dev",
+    "build:email-verifier": "npm -w apps/email-verifier run build"
   }
 }
