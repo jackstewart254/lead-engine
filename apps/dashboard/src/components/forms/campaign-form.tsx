@@ -3,10 +3,15 @@
 import { useActionState } from "react";
 import { motion } from "framer-motion";
 import { createCampaign } from "@/app/campaigns/actions";
+interface AccountOption {
+  id: string;
+  label: string;
+  sender_email: string;
+}
 
 const initialState = { error: "" };
 
-export function CampaignForm() {
+export function CampaignForm({ emailAccounts }: { emailAccounts: AccountOption[] }) {
   const [state, formAction, pending] = useActionState(createCampaign, initialState);
 
   return (
@@ -46,6 +51,22 @@ export function CampaignForm() {
             placeholder="Glasgow"
           />
         </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-muted">
+            Send From
+          </label>
+          <select
+            name="email_account_id"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="">Default (env vars)</option>
+            {emailAccounts.map((account) => (
+              <option key={account.id} value={account.id}>
+                {account.label} ({account.sender_email})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="mt-4">
         <label className="mb-1 block text-sm font-medium text-muted">
@@ -56,7 +77,7 @@ export function CampaignForm() {
           required
           rows={6}
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono"
-          placeholder="Hi {{owner_name}}, I noticed {{business_name}}..."
+          placeholder={"Hi {{first_name}}, how are you doing?\n\nI'm Jack Stewart, I run a company called Mclean Stewart. Just wanted to introduce myself and what we do in case it's ever useful to you.\n\nWe build bespoke software, websites, and AI tools for businesses. The idea is simple — we look at how a business actually operates and build technology around that...\n\nIf you'd like to find out more, have a look at our website: mcleanstewart.co.uk.\n\nFeel free to get in touch if you ever have any enquiries — always happy to have a chat.\n\nAll the best.\n\nVariables: {{first_name}}, {{owner_name}}, {{business_name}}, {{website}}, {{role}}, {{category}}, {{location}}\n\n(Signature is added automatically — don't include a sign-off)"}
         />
       </div>
       {state.error && (
