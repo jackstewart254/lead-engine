@@ -1,90 +1,70 @@
-import { htmlToText } from "./html-to-text";
+import { spawn } from "child_process";
+import path from "path";
 
-const SUBPAGES = [
-  "/about",
-  "/about-us",
-  "/contact",
-  "/contact-us",
-  "/team",
-  "/our-team",
-];
+type PageType = "homepage" | "team" | "about" | "contact" | "other";
 
-const FETCH_TIMEOUT_MS = 10_000;
-
-async function fetchPage(url: string): Promise<string | null> {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; LeadEngine/1.0; +https://mcleanstewart.co.uk)",
-      },
-      redirect: "follow",
-    });
-    clearTimeout(timer);
-
-    if (!res.ok) return null;
-
-    const contentType = res.headers.get("content-type") ?? "";
-    if (!contentType.includes("text/html")) return null;
-
-    return await res.text();
-  } catch {
-    return null;
-  }
-}
-
-function normalizeBaseUrl(website: string): string {
-  let url = website.trim();
-  if (!url.startsWith("http")) url = `https://${url}`;
-  // Remove trailing slash
-  return url.replace(/\/+$/, "");
+export interface PageResult {
+  path: string;
+  html: string;
+  text: string;
+  type: PageType;
 }
 
 export interface CrawlResult {
   url: string;
   text: string;
+  pages: PageResult[];
   pagesCrawled: number;
   totalChars: number;
 }
 
-export async function crawlWebsite(website: string): Promise<CrawlResult | null> {
-  const base = normalizeBaseUrl(website);
-  const sections: string[] = [];
+const SUBPROCESS_TIMEOUT_MS = 120_000;
 
-  // Fetch homepage
-  const homepage = await fetchPage(base);
-  if (!homepage) return null;
+export async function crawlWebsite(
+  website: string
+): Promise<CrawlResult | null> {
+  const scriptPath = path.resolve(__dirname, "..", "crawl.py");
 
-  sections.push(`[Homepage]\n${htmlToText(homepage, 3000)}`);
+  return new Promise((resolve) => {
+    const proc = spawn("python3", [scriptPath, website], {
+      stdio: ["ignore", "pipe", "pipe"],
+      timeout: SUBPROCESS_TIMEOUT_MS,
+    });
 
-  // Fetch subpages in parallel
-  const subResults = await Promise.allSettled(
-    SUBPAGES.map(async (path) => {
-      const html = await fetchPage(`${base}${path}`);
-      if (!html) return null;
-      const text = htmlToText(html, 2000);
-      // Skip if too short (likely 404 page) or duplicate of homepage
-      if (text.length < 50) return null;
-      return { path, text };
-    })
-  );
+    let stdout = "";
+    let stderr = "";
 
-  for (const result of subResults) {
-    if (result.status === "fulfilled" && result.value) {
-      sections.push(`[${result.value.path}]\n${result.value.text}`);
-    }
-  }
+    proc.stdout.on("data", (chunk: Buffer) => {
+      stdout += chunk.toString();
+    });
 
-  const combined = sections.join("\n\n");
+    proc.stderr.on("data", (chunk: Buffer) => {
+      stderr += chunk.toString();
+    });
 
-  return {
-    url: base,
-    text: combined,
-    pagesCrawled: sections.length,
-    totalChars: combined.length,
-  };
+    proc.on("error", (err) => {
+      console.error(`crawl.py spawn error: ${err.message}`);
+      resolve(null);
+    });
+
+    proc.on("close", (code) => {
+      if (code !== 0) {
+        console.error(`crawl.py exited with code ${code}: ${stderr}`);
+        resolve(null);
+        return;
+      }
+
+      try {
+        const result = JSON.parse(stdout);
+        if (!result) {
+          resolve(null);
+          return;
+        }
+        resolve(result as CrawlResult);
+      } catch (err) {
+        console.error(`crawl.py JSON parse error: ${err}`);
+        resolve(null);
+      }
+    });
+  });
 }
